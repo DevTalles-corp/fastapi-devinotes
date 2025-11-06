@@ -3,14 +3,22 @@ import os
 from typing import Iterator
 from sqlmodel import SQLModel, Session, create_engine
 
+from alembic.env import DATABASE_URL
 from app.core.config import settings
 
-DATABASE_URL = os.environ["DATABASE_URL"]
-connect_args = {}
-if DATABASE_URL.startswith("postgres"):
-    connect_args = {"sslmode": "require"}
-engine = create_engine(DATABASE_URL, pool_pre_ping=True,
-                       connect_args=connect_args)
+raw_url = os.environ["DATABASE_URL"]
+
+# Fuerza a psycopg 3
+url = raw_url
+if url.startswith("postgres://"):
+    url = "postgresql+psycopg://" + url[len("postgres://"):]
+elif url.startswith("postgresql://") and "+psycopg" not in url:
+    url = "postgresql+psycopg://" + url[len("postgresql://"):]
+
+DATABASE_URL = url
+
+engine = create_engine(url, pool_pre_ping=True)
+
 
 # engine = create_engine(settings.DATABASE_URL, echo=False, connect_args={
 #                        "check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {})
