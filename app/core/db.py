@@ -3,7 +3,7 @@ import os
 from typing import Iterator
 from sqlmodel import SQLModel, Session, create_engine
 
-from alembic.env import DATABASE_URL
+# from alembic.env import DATABASE_URL
 from app.core.config import settings
 
 raw_url = os.environ["DATABASE_URL"]
